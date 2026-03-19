@@ -10,6 +10,11 @@ class BubbleChart {
         this.categorySelection = "nutriscore_grade";
         this.displayData = [];
         this.totalValidCount = 0;
+        // Drill-down state
+        this.drillMode = false;
+        this.drillFilterField = null;
+        this.drillFilterValue = null;
+        this.drillDisplayField = null;
         this.initVis();
     }
 
@@ -19,6 +24,30 @@ class BubbleChart {
         vis.margin = { top: 16, right: 16, bottom: 16, left: 16 };
         vis.width = 700 - vis.margin.left - vis.margin.right;
         vis.height = 520 - vis.margin.top - vis.margin.bottom;
+
+        // Back button – inserted before the first <select> in chart-area
+        vis.backBtn = d3.select(vis.parentElement)
+            .insert("button", "select")
+            .attr("id", "backBtn")
+            .style("display", "none")
+            .text("← Back")
+            .on("click", () => vis.goBack());
+
+        // Second dropdown – shown only when drilling into a brand
+        vis.subDropdown = d3.select(vis.parentElement)
+            .append("select")
+            .attr("id", "subCategorySelection")
+            .style("display", "none");
+
+        vis.subDropdown.append("option").attr("value", "nutriscore_grade").text("Nutri-Score Grade");
+        vis.subDropdown.append("option").attr("value", "ecoscore_grade").text("Eco-Score Grade");
+
+        vis.subDropdown.on("change", function() {
+            if (vis.drillMode) {
+                vis.drillDisplayField = this.value;
+                vis.wrangleData();
+            }
+        });
 
         vis.svg = d3.select(vis.parentElement)
             .append("svg")
@@ -69,8 +98,23 @@ class BubbleChart {
         let vis = this;
 
         const TOP_N = 20;
-        const validValues = vis.data
-            .map(d => d[vis.categorySelection])
+
+        let filteredData, activeField;
+
+        if (vis.drillMode) {
+            filteredData = vis.data.filter(d => {
+                const v = d[vis.drillFilterField];
+                return v !== null && v !== undefined &&
+                    String(v).toLowerCase() === vis.drillFilterValue;
+            });
+            activeField = vis.drillDisplayField;
+        } else {
+            filteredData = vis.data;
+            activeField = vis.categorySelection;
+        }
+
+        const validValues = filteredData
+            .map(d => d[activeField])
             .filter(d => d !== null && d !== undefined && d !== "" && d !== "unknown");
 
         vis.totalValidCount = validValues.length;
@@ -135,12 +179,16 @@ class BubbleChart {
         const bubblesMerge = bubblesEnter.merge(bubbles);
 
         bubblesMerge
+            .style("cursor", vis.drillMode ? "default" : "pointer")
+            .on("click", function(event, d) {
+                if (!vis.drillMode) vis.drillDown(d.data.name);
+            })
             .on("mouseenter", function(event, d) {
                 const share = vis.totalValidCount ? ((d.data.value / vis.totalValidCount) * 100).toFixed(2) : "0.00";
                 vis.tooltip
                     .style("display", "block")
                     .html(
-                        `<strong>Category:</strong> ${vis.categorySelection}<br>` +
+                        `<strong>Category:</strong> ${vis.drillMode ? vis.drillDisplayField : vis.categorySelection}<br>` +
                         `<strong>Value:</strong> ${d.data.name}<br>` +
                         `<strong>Products:</strong> ${d.data.value}<br>` +
                         `<strong>Share:</strong> ${share}%`
@@ -172,10 +220,45 @@ class BubbleChart {
             .style("font-size", d => `${Math.max(10, Math.min(16, d.r * 0.25))}px`);
     }
 
+    drillDown(clickedName) {
+        let vis = this;
+        vis.drillMode = true;
+        vis.drillFilterField = vis.categorySelection;
+        vis.drillFilterValue = clickedName;
+
+        if (vis.categorySelection === "brands") {
+            // Drill into grade breakdown for a specific brand
+            vis.drillDisplayField = vis.subDropdown.property("value");
+            vis.subDropdown.style("display", null);
+        } else {
+            // Drill into brand breakdown for a specific grade
+            vis.drillDisplayField = "brands";
+            vis.subDropdown.style("display", "none");
+        }
+
+        vis.backBtn.style("display", null);
+        vis.wrangleData();
+    }
+
+    goBack() {
+        let vis = this;
+        vis.drillMode = false;
+        vis.drillFilterField = null;
+        vis.drillFilterValue = null;
+        vis.drillDisplayField = null;
+        vis.backBtn.style("display", "none");
+        vis.subDropdown.style("display", "none");
+        vis.wrangleData();
+    }
+
     //Public method to update selected category and redraw
     setCategory(category) {
         this.categorySelection = category;
-        this.wrangleData();
+        if (this.drillMode) {
+            this.goBack();
+        } else {
+            this.wrangleData();
+        }
     }
 
 

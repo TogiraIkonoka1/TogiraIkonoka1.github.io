@@ -36,12 +36,29 @@ p {
 	gap: 14px;
 }
 
-#categorySelection {
+#categorySelection,
+#subCategorySelection {
 	padding: 8px 10px;
 	border-radius: 6px;
 	border: 1px solid #8fa9d6;
 	background: #f8fbff;
 	color: #10243f;
+}
+
+#backBtn {
+	padding: 7px 14px;
+	border-radius: 6px;
+	border: 1px solid #8fa9d6;
+	background: transparent;
+	color: #d7e3ff;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+}
+
+#backBtn:hover {
+	background: #1d3a6e;
+	color: #ffffff;
 }
 
 .citation {

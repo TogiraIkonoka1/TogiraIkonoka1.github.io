@@ -23,3 +23,13 @@ Vis tpye
 
 
 [food type] = snacks, fast food, sugary drinks, specific junk foods i.e. chips, chocolate bars, etc.
+
+Next Task:
+Modify the bubble chart to allow clicking on a bubble to reveal more information by applying additional filters to the bubble chart.
+- When dropdown set to nutriscore_grade or ecoscore_grade: clicking on a bubble filters data for data points with the grade of the bubble clicked on, 
+  then reveals the bubble chart using frequency of brands as the values.
+- When dropdown set to brands: clicking a bubble reveals a second dropdown bar. This second dropdown bar has two options: ecoscore_grade
+  and nutriscore_grade. We filter data for points with the brand of the bubble clicked on, then apply the selection of the second dropdown bar 
+  either nutriscore_grade or ecoscore_grade values, to the bubble chart.
+- Finally, after we have clicked on a bubble, a back button should appear in the top left. clicking it should take us to the bubble chart based solely
+  on the first dropdown bar (without any additional filtering)
