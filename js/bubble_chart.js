@@ -9,6 +9,7 @@ class BubbleChart {
         this.data = data;
         this.categorySelection = "nutriscore_grade";
         this.displayData = [];
+        this.totalValidCount = 0;
         this.initVis();
     }
 
@@ -34,6 +35,22 @@ class BubbleChart {
             .range(["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1"]);
 
         vis.nodesGroup = vis.svg.append("g").attr("class", "bubble-nodes");
+        vis.tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "bubble-tooltip")
+            .style("position", "fixed")
+            .style("z-index", "1000")
+            .style("pointer-events", "none")
+            .style("background", "rgba(8, 14, 30, 0.94)")
+            .style("color", "#f2f6ff")
+            .style("border", "1px solid #9bb4df")
+            .style("border-radius", "8px")
+            .style("padding", "10px 12px")
+            .style("font-size", "13px")
+            .style("line-height", "1.35")
+            .style("box-shadow", "0 6px 18px rgba(0, 0, 0, 0.32)")
+            .style("display", "none");
+
         vis.noDataText = vis.svg.append("text")
             .attr("class", "no-data-label")
             .attr("x", vis.width / 2)
@@ -52,11 +69,14 @@ class BubbleChart {
         let vis = this;
 
         const TOP_N = 20;
+        const validValues = vis.data
+            .map(d => d[vis.categorySelection])
+            .filter(d => d !== null && d !== undefined && d !== "" && d !== "unknown");
+
+        vis.totalValidCount = validValues.length;
 
         const aggregated = d3.rollups(
-            vis.data
-                .map(d => d[vis.categorySelection])
-                .filter(d => d !== null && d !== undefined && d !== "" && d !== "unknown"),
+            validValues,
             values => values.length,
             d => String(d).toLowerCase()
         )
@@ -79,6 +99,7 @@ class BubbleChart {
         let vis = this;
 
         vis.noDataText.style("display", vis.displayData.length ? "none" : null);
+        vis.tooltip.style("display", "none");
 
         const bubbles = vis.nodesGroup
             .selectAll(".bubble-node")
@@ -112,6 +133,27 @@ class BubbleChart {
             .text(d => d.data.name.toUpperCase());
 
         const bubblesMerge = bubblesEnter.merge(bubbles);
+
+        bubblesMerge
+            .on("mouseenter", function(event, d) {
+                const share = vis.totalValidCount ? ((d.data.value / vis.totalValidCount) * 100).toFixed(2) : "0.00";
+                vis.tooltip
+                    .style("display", "block")
+                    .html(
+                        `<strong>Category:</strong> ${vis.categorySelection}<br>` +
+                        `<strong>Value:</strong> ${d.data.name}<br>` +
+                        `<strong>Products:</strong> ${d.data.value}<br>` +
+                        `<strong>Share:</strong> ${share}%`
+                    );
+            })
+            .on("mousemove", function(event) {
+                vis.tooltip
+                    .style("left", `${event.clientX + 14}px`)
+                    .style("top", `${event.clientY + 14}px`);
+            })
+            .on("mouseleave", function() {
+                vis.tooltip.style("display", "none");
+            });
 
         bubblesMerge.transition()
             .duration(600)
