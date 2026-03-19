@@ -97,3 +97,16 @@ p {
 .citation a {
 	color: #ffffff;
 }
+
+.bubble-tooltip-cta {
+	margin-top: 8px;
+	padding: 4px 8px;
+	border-radius: 999px;
+	background: #f28e2c;
+	color: #08101e;
+	font-weight: 700;
+	font-size: 0.9rem;
+	letter-spacing: 0.02em;
+	text-align: center;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}

@@ -191,7 +191,8 @@ class BubbleChart {
                         `<strong>Category:</strong> ${vis.drillMode ? vis.drillDisplayField : vis.categorySelection}<br>` +
                         `<strong>Value:</strong> ${d.data.name}<br>` +
                         `<strong>Products:</strong> ${d.data.value}<br>` +
-                        `<strong>Share:</strong> ${share}%`
+                        `<strong>Share:</strong> ${share}%` +
+                        `<div class="bubble-tooltip-cta">Click to see breakdown.</div>`
                     );
             })
             .on("mousemove", function(event) {
