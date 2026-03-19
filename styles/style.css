@@ -43,3 +43,19 @@ p {
 	background: #f8fbff;
 	color: #10243f;
 }
+
+.citation {
+	margin-top: 36px;
+	padding-top: 12px;
+	border-top: 1px solid rgba(215, 227, 255, 0.35);
+}
+
+.citation p {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #b7c9ef;
+}
+
+.citation a {
+	color: #ffffff;
+}

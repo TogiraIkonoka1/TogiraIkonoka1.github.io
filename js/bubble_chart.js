@@ -51,6 +51,8 @@ class BubbleChart {
     wrangleData() {
         let vis = this;
 
+        const TOP_N = 20;
+
         const aggregated = d3.rollups(
             vis.data
                 .map(d => d[vis.categorySelection])
@@ -59,7 +61,8 @@ class BubbleChart {
             d => String(d).toLowerCase()
         )
             .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => d3.descending(a.value, b.value));
+            .sort((a, b) => d3.descending(a.value, b.value))
+            .slice(0, TOP_N);
 
         if (aggregated.length === 0) {
             vis.displayData = [];
