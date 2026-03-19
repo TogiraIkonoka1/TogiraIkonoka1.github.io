@@ -14,6 +14,22 @@ By Deadline
  - Implement detalied tooltips, interlocking visualization components
 
 
+Desired Feedback:
+What could make the information clearer?
+Is the purpose obvious?
+What interactions would help clarify other questions you might have?
+Does the coulour palette need adjustment?
+Do you understand how NutriScore is and ECO Score are used in this context?
+Should I include the not applicable/missing data? How can I better represent the rate of missing data?
+
+
+Feedback emails
+antonm.cassidy@mail.utoronto.ca
+bao.hoang@mail.utoronto.ca
+jaehyung.lee@mail.utoronto.ca  (Jay)
+areesha.abidi@mail.utoronto.ca
+ansonbt.lau@mail.utoronto.ca
+
 
 _________________________________________________________________________________________________________________
 
