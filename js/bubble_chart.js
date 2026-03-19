@@ -25,8 +25,8 @@ class BubbleChart {
         vis.width = 700 - vis.margin.left - vis.margin.right;
         vis.height = 520 - vis.margin.top - vis.margin.bottom;
 
-        // Back button – inserted before the first <select> in chart-area
-        vis.backBtn = d3.select(vis.parentElement)
+        // Back button – inserted before the first <select> in chart-controls
+        vis.backBtn = d3.select("#chart-controls")
             .insert("button", "select")
             .attr("id", "backBtn")
             .style("display", "none")
@@ -34,7 +34,7 @@ class BubbleChart {
             .on("click", () => vis.goBack());
 
         // Second dropdown – shown only when drilling into a brand
-        vis.subDropdown = d3.select(vis.parentElement)
+        vis.subDropdown = d3.select("#chart-controls")
             .append("select")
             .attr("id", "subCategorySelection")
             .style("display", "none");
