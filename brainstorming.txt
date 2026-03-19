@@ -1,0 +1,25 @@
+Brainstorming file for thoughts on visualization
+
+
+Todo List
+_________________________________________________________________________________________________________________
+By Thursday
+ - Brainstorming
+ - Prototype Ideas: Acquire data set and put together scripts, styles, hmtl for vis.
+ - Compile narrative for sharing 
+By Deadline
+ - Refine vis. 
+ - Expand in other directions.
+ - Polish website design. Refine style choices.
+ - Implement detalied tooltips, interlocking visualization components
+
+
+
+_________________________________________________________________________________________________________________
+
+Ideas
+Food data-> interactive visualization about the components of popular [food type] items. Data on ingredients + source of ingredients.
+Vis tpye
+
+
+[food type] = snacks, fast food, sugary drinks, specific junk foods i.e. chips, chocolate bars, etc.
