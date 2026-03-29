@@ -38,7 +38,8 @@ p {
 }
 
 #score-explanation-panel {
-	width: 250px;
+	width: 340px;
+	max-width: 36vw;
 	background: rgba(13, 30, 60, 0.85);
 	border: 1px solid #2a4a7f;
 	border-radius: 8px;
@@ -58,8 +59,8 @@ p {
 
 #score-explanation-panel p {
 	text-align: left;
-	font-size: 0.9rem;
-	line-height: 1.45;
+	font-size: 0.95rem;
+	line-height: 1.5;
 	color: #d7e3ff;
 	margin: 0 0 10px;
 }

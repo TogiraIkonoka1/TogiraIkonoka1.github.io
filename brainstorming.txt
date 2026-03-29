@@ -103,3 +103,6 @@ Task 8:
   If the first selection is "brands" and the "Asda" brand is clicked and then an ecoscore or nutriscore grade is clicked, the subtitle should be 
   "Analyse the Various Characteristics and Demographics of Items belonging to Asda"
 - the popup panel should be referred to as the detailed-view-panel and should have a central svg area (leave blank for now)
+
+Task 9:
+- modify the side panel explaining the nutriscore and ecoscore to be wider so that the letters are not so squished.
