@@ -63,12 +63,22 @@ class BubbleChart {
         vis.colorScale = d3.scaleOrdinal()
             .range(["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1"]);
 
-        vis.gradeColorMap = {
+        vis.nutriscoreColorMap = {
             a: "#038141",
             b: "#85BB2F",
             c: "#FECB02",
             d: "#EE8100",
             e: "#E63E11"
+        };
+
+        vis.ecoscoreColorMap = {
+            "a+": "#005C2E",
+            a:    "#038141",
+            b:    "#85BB2F",
+            c:    "#FECB02",
+            d:    "#FFAD00",
+            e:    "#EE8100",
+            f:    "#E63E11"
         };
 
         vis.nodesGroup = vis.svg.append("g").attr("class", "bubble-nodes");
@@ -121,9 +131,19 @@ class BubbleChart {
             activeField = vis.categorySelection;
         }
 
+        const NA_VALUES = new Set([
+            "unknown", "not-applicable", "not applicable", "not_applicable",
+            "not-available", "not available", "not_available",
+            "n/a", "na"
+        ]);
+
         const validValues = filteredData
             .map(d => d[activeField])
-            .filter(d => d !== null && d !== undefined && d !== "" && d !== "unknown");
+            .filter(d => {
+                if (d === null || d === undefined || d === "") return false;
+                const s = String(d).toLowerCase();
+                return !NA_VALUES.has(s) && !s.startsWith("en:not-");
+            });
 
         vis.totalValidCount = validValues.length;
 
@@ -230,6 +250,8 @@ class BubbleChart {
             .transition()
             .duration(600)
             .style("font-size", d => `${Math.max(10, Math.min(16, d.r * 0.25))}px`);
+
+        vis.renderLegend();
     }
 
     drillDown(clickedName) {
@@ -282,11 +304,49 @@ class BubbleChart {
         const activeField = vis.getActiveColorField();
         const value = String(rawValue).toLowerCase();
 
-        if (activeField === "nutriscore_grade" || activeField === "ecoscore_grade") {
-            return vis.gradeColorMap[value] || "#9aa0a6";
+        if (activeField === "nutriscore_grade") {
+            return vis.nutriscoreColorMap[value] || "#9aa0a6";
+        }
+        if (activeField === "ecoscore_grade") {
+            return vis.ecoscoreColorMap[value] || "#9aa0a6";
         }
 
         return vis.colorScale(value);
+    }
+
+    renderLegend() {
+        let vis = this;
+        const activeField = vis.getActiveColorField();
+        const legendEl = document.getElementById("chart-legend");
+        if (!legendEl) return;
+
+        let html = "";
+
+        if (activeField === "nutriscore_grade") {
+            html += `<h4 class="legend-title">Nutri-Score</h4>`;
+            [["A", "#038141"], ["B", "#85BB2F"], ["C", "#FECB02"], ["D", "#EE8100"], ["E", "#E63E11"]]
+                .forEach(([label, color]) => {
+                    html += `<div class="legend-item"><span class="legend-swatch" style="background:${color}"></span><span>${label}</span></div>`;
+                });
+        } else if (activeField === "ecoscore_grade") {
+            html += `<h4 class="legend-title">Eco-Score</h4>`;
+            [["A+", "#005C2E"], ["A", "#038141"], ["B", "#85BB2F"], ["C", "#FECB02"], ["D", "#FFAD00"], ["E", "#EE8100"], ["F", "#E63E11"]]
+                .forEach(([label, color]) => {
+                    html += `<div class="legend-item"><span class="legend-swatch" style="background:${color}"></span><span>${label}</span></div>`;
+                });
+        } else {
+            html += `<h4 class="legend-title">Brands</h4>`;
+            if (vis.displayData.length > 0) {
+                vis.displayData.forEach(d => {
+                    const color = vis.colorScale(d.data.name);
+                    html += `<div class="legend-item"><span class="legend-swatch" style="background:${color}"></span><span class="legend-label">${d.data.name}</span></div>`;
+                });
+            } else {
+                html += `<span class="legend-empty">No data</span>`;
+            }
+        }
+
+        legendEl.innerHTML = html;
     }
 
 

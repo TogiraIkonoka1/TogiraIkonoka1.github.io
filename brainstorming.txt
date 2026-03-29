@@ -63,6 +63,16 @@ Task 3:
   It ranges from A:dark green, B:light green, C:yellow, D:orange, E:red. ecoscore_grade uses the same colour scheme.
 - When drilling down on a bubble, the tooltip should stop displaying "Click to see breakdown."
 
-
+Task 4:
+- Leave out the not applicable and not available data points from the bubble chart. 
+- Change the ecoscore_grade colour scheme slightly:
+    A+:dark green
+    A:green
+    B:light green
+    C:yellow
+    D:light orange
+    E:orange
+    F:red
+- Add a side panel for a legend. The legend should update whenever a selection is made (either an initial selection, drilling down, or backing out)
 
 

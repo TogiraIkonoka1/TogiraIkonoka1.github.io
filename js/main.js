@@ -25,7 +25,7 @@ function loadDataWithFallback() {
 
 loadDataWithFallback()
     .then(function(data) {
-        bubbleChart = new BubbleChart("#chart-area", data);
+        bubbleChart = new BubbleChart("#chart-main", data);
 
         const categoryDropdown = d3.select("#categorySelection");
         bubbleChart.setCategory(categoryDropdown.property("value"));

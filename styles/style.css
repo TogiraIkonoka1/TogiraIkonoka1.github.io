@@ -31,9 +31,16 @@ p {
 
 #chart-area {
 	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 24px;
+}
+
+#chart-main {
+	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0;
 }
 
 #chart-controls {
@@ -86,6 +93,57 @@ p {
 	margin-top: 36px;
 	padding-top: 12px;
 	border-top: 1px solid rgba(215, 227, 255, 0.35);
+}
+
+#chart-legend {
+	min-width: 130px;
+	max-width: 175px;
+	margin-top: 54px;
+	background: rgba(13, 30, 60, 0.85);
+	border: 1px solid #2a4a7f;
+	border-radius: 8px;
+	padding: 14px 16px;
+	max-height: 490px;
+	overflow-y: auto;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.legend-title {
+	margin: 0 0 10px;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	color: #9bb4df;
+	font-weight: 600;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 7px;
+	font-size: 0.88rem;
+	color: #d7e3ff;
+}
+
+.legend-swatch {
+	width: 15px;
+	height: 15px;
+	border-radius: 3px;
+	display: inline-block;
+	flex-shrink: 0;
+	border: 1px solid rgba(255,255,255,0.15);
+}
+
+.legend-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.legend-empty {
+	font-size: 0.82rem;
+	color: #7a8faf;
 }
 
 .citation p {
