@@ -150,7 +150,11 @@ class BubbleChart {
         const aggregated = d3.rollups(
             validValues,
             values => values.length,
-            d => String(d).toLowerCase()
+            d => {
+                const s = String(d).toLowerCase();
+                if (activeField === "ecoscore_grade" && s === "a-plus") return "a+";
+                return s;
+            }
         )
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => d3.descending(a.value, b.value))
@@ -202,7 +206,7 @@ class BubbleChart {
             .style("font-size", d => `${Math.max(10, Math.min(16, d.r * 0.25))}px`)
             .style("pointer-events", "none")
             .style("fill", "#fff")
-            .text(d => d.data.name.toUpperCase());
+            .text(d => vis.formatDisplayLabel(d.data.name));
 
         const bubblesMerge = bubblesEnter.merge(bubbles);
 
@@ -314,6 +318,15 @@ class BubbleChart {
         return vis.colorScale(value);
     }
 
+    formatDisplayLabel(name) {
+        const activeField = this.getActiveColorField();
+        if (activeField === "nutriscore_grade" || activeField === "ecoscore_grade") {
+            return name.toUpperCase();
+        }
+        // Brand names: title case (proper noun)
+        return name.replace(/\b\w/g, c => c.toUpperCase());
+    }
+
     renderLegend() {
         let vis = this;
         const activeField = vis.getActiveColorField();
@@ -339,7 +352,7 @@ class BubbleChart {
             if (vis.displayData.length > 0) {
                 vis.displayData.forEach(d => {
                     const color = vis.colorScale(d.data.name);
-                    html += `<div class="legend-item"><span class="legend-swatch" style="background:${color}"></span><span class="legend-label">${d.data.name}</span></div>`;
+                    html += `<div class="legend-item"><span class="legend-swatch" style="background:${color}"></span><span class="legend-label">${vis.formatDisplayLabel(d.data.name)}</span></div>`;
                 });
             } else {
                 html += `<span class="legend-empty">No data</span>`;

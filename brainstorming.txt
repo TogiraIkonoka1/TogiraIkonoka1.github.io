@@ -75,4 +75,7 @@ Task 4:
     F:red
 - Add a side panel for a legend. The legend should update whenever a selection is made (either an initial selection, drilling down, or backing out)
 
-
+Task 5:
+- for ecoscore_grade, ensure that A-PLUS in the bubble chart matches the A+ entry in the legend and colour scheme. A-PLUS in the bubble chart should be dark green and be labelled A+.
+- for the legend when viewing brands or drilling down to see brands: change the legend entries to match the names in the bubble chart.
+  In particular, the capitalization should be as normal for a proper noun.
