@@ -4,9 +4,9 @@ let bubbleChart;
 function loadDataWithFallback() {
     const pageDir = window.location.pathname.replace(/\/[^/]*$/, "/");
     const candidates = [
-        "data/filtered_sample1.json",
-        "./data/filtered_sample1.json",
-        `${pageDir}data/filtered_sample1.json`
+        "data/random_sample1.json",
+        "./data/random_sample1.json",
+        `${pageDir}data/random_sample1.json`
     ];
 
     let lastError = null;

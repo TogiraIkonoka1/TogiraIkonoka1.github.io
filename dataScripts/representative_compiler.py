@@ -8,9 +8,7 @@ writing them to a new file for visualization purposes.
 import json
 import random
 import os
-import sys
 import argparse
-from pathlib import Path
 
 def compile_representatives(input_file, output_file, sample_size=10000):
     """
@@ -18,18 +16,25 @@ def compile_representatives(input_file, output_file, sample_size=10000):
     
     Args:
         input_file (str): Path to the input JSONL file
-        output_file (str): Path to the output text file
+        output_file (str): Path to the output JSON file
         sample_size (int): Number of representative data points to compile (default: 10000)
     """
     if not os.path.exists(input_file):
         print(f"Error: Input file '{input_file}' not found.")
         return False
     
+    if sample_size <= 0:
+        print("Error: sample_size must be greater than 0.")
+        return False
+
     print(f"Reading data from: {input_file}")
     print(f"Target sample size: {sample_size}")
-    
-    # First pass: count total records and collect all records
-    records = []
+    print("Sampling strategy: reservoir sampling (constant memory)")
+
+    reservoir = []
+    valid_count = 0
+    malformed_count = 0
+
     try:
         with open(input_file, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
@@ -38,41 +43,45 @@ def compile_representatives(input_file, output_file, sample_size=10000):
                     continue
                 try:
                     record = json.loads(line)
-                    records.append(record)
                 except json.JSONDecodeError as e:
-                    print(f"Warning: Failed to parse JSON at line {line_num}: {e}")
+                    malformed_count += 1
+                    if malformed_count <= 5:
+                        print(f"Warning: Failed to parse JSON at line {line_num}: {e}")
                     continue
-                
-                # Print progress every 100,000 records
-                if line_num % 100000 == 0:
-                    print(f"  Progress: {line_num} records read...")
+
+                valid_count += 1
+                if len(reservoir) < sample_size:
+                    reservoir.append(record)
+                else:
+                    # Replace elements with gradually decreasing probability.
+                    j = random.randint(1, valid_count)
+                    if j <= sample_size:
+                        reservoir[j - 1] = record
+
+                if valid_count % 1_000_000 == 0:
+                    print(f"  Progress: {valid_count:,} valid records processed...")
     
     except IOError as e:
         print(f"Error reading input file: {e}")
         return False
-    
-    total_records = len(records)
-    print(f"Total records read: {total_records}")
-    
-    if total_records == 0:
+
+    print(f"Total valid records read: {valid_count:,}")
+    print(f"Malformed JSON lines skipped: {malformed_count:,}")
+
+    if valid_count == 0:
         print("Error: No valid records found in the input file.")
         return False
-    
-    # Sample or use all records if fewer than sample_size
-    if total_records <= sample_size:
-        selected_records = records
-        print(f"Using all {total_records} records (fewer than target {sample_size})")
+
+    if valid_count <= sample_size:
+        selected_records = reservoir
+        print(f"Using all {valid_count:,} valid records (fewer than target {sample_size:,})")
     else:
-        # Randomly sample records for representative distribution
-        selected_records = random.sample(records, sample_size)
-        print(f"Randomly sampled {sample_size} representative data points")
-    
-    # Write output file
+        selected_records = reservoir
+        print(f"Reservoir sampled {sample_size:,} representative data points")
+
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
-            for record in selected_records:
-                json_line = json.dumps(record, ensure_ascii=False)
-                f.write(json_line + '\n')
+            json.dump(selected_records, f, ensure_ascii=False, indent=2)
         
         print(f"Successfully wrote {len(selected_records)} records to: {output_file}")
         print(f"Output file size: {os.path.getsize(output_file) / (1024*1024):.2f} MB")
@@ -92,8 +101,8 @@ def main():
 Examples:
   python representative_compiler.py
   python representative_compiler.py openfoodfacts-products.jsonl
-  python representative_compiler.py openfoodfacts-products.jsonl --output mydata.txt --sample 5000
-  python representative_compiler.py -i products.jsonl -o output.txt -s 15000
+    python representative_compiler.py openfoodfacts-products.jsonl --output mydata.json --sample 5000
+        python representative_compiler.py products.jsonl -o output.json -s 15000 --seed 42
         """
     )
     
@@ -105,8 +114,8 @@ Examples:
     )
     parser.add_argument(
         '-o', '--output',
-        default='compiled_representatives.txt',
-        help='Output file name (default: compiled_representatives.txt in same directory as input)'
+        default='compiled_representatives.json',
+        help='Output file name (default: compiled_representatives.json in same directory as input)'
     )
     parser.add_argument(
         '-s', '--sample',
@@ -114,8 +123,18 @@ Examples:
         default=10000,
         help='Number of representative data points to compile (default: 10000)'
     )
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=None,
+        help='Optional random seed for reproducible sampling'
+    )
     
     args = parser.parse_args()
+
+    if args.seed is not None:
+        random.seed(args.seed)
+        print(f"Using random seed: {args.seed}")
     
     # Resolve paths relative to current working directory
     input_path = os.path.abspath(args.input)

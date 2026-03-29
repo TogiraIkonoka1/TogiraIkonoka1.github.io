@@ -83,3 +83,7 @@ Task 5:
 Task 6:
 - in dataScripts/representative_compiler.py write a python script that will read C:\Users\anton\316 Projects\A3\openfoodfacts-products.jsonl
   and compile 10000 represntative data points into a file called compiled_representatives.txt in the same directory.
+
+Task 7: 
+- in dataScripts/compiled_formatting write a python script that will read and format the output of representative_compiler.py into a format
+  similar to data/filtered_sample1.json (a format usable by the current javascript files)
