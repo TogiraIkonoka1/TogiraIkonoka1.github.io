@@ -87,3 +87,19 @@ Task 6:
 Task 7: 
 - in dataScripts/compiled_formatting write a python script that will read and format the output of representative_compiler.py into a format
   similar to data/filtered_sample1.json (a format usable by the current javascript files)
+- Modify the html/javascripts to make use of the new randomly selected data.
+
+Task 8:
+- modify the text explanations: place the explanation of the Ecoscore and Nutriscore in a panel on the left. Leave the rest of the context above the bubble chart.
+  Place a single bolded section above the bubble chart and the dropdown menus, below the context paragraph: 
+  Select from the menus to choose a category, and click on a bubble to see a detailed breakdown.
+- After an first selection has been made and we have drilled down one layer:
+  Tooltip should now say "Click to see detailed view."
+  Clicking should open a detailed view panel. The button to close this panel should be in the top right and be a standard X.
+  The panel should have a title that is "Detailed View",
+  a subtitle that is "Analyse the various characteristics and demographics of {category}" where {category} is replaced with the initial selected category (the first bubble clicked.)
+  For example, if the first dropdown bar is set to Ecoscore, and the bubble "A" is clicked, and then the bubble for a brand is clicked, the subtitle should be 
+  "Analyse the Various Characteristics and Demographics of Items with Ecoscore Rating A"
+  If the first selection is "brands" and the "Asda" brand is clicked and then an ecoscore or nutriscore grade is clicked, the subtitle should be 
+  "Analyse the Various Characteristics and Demographics of Items belonging to Asda"
+- the popup panel should be referred to as the detailed-view-panel and should have a central svg area (leave blank for now)

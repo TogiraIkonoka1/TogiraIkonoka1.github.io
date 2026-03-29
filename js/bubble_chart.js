@@ -108,6 +108,17 @@ class BubbleChart {
             .style("display", "none")
             .text("No data available for this category");
 
+        vis.detailedViewPanel = d3.select("#detailed-view-panel");
+        vis.detailedViewSubtitle = d3.select("#detailed-view-subtitle");
+        vis.detailedViewCloseBtn = d3.select("#detailed-view-close");
+
+        vis.detailedViewCloseBtn.on("click", () => vis.closeDetailedView());
+        vis.detailedViewPanel.on("click", function(event) {
+            if (event.target === this) {
+                vis.closeDetailedView();
+            }
+        });
+
         vis.wrangleData();
     }
 
@@ -211,14 +222,18 @@ class BubbleChart {
         const bubblesMerge = bubblesEnter.merge(bubbles);
 
         bubblesMerge
-            .style("cursor", vis.drillMode ? "default" : "pointer")
+            .style("cursor", "pointer")
             .on("click", function(event, d) {
-                if (!vis.drillMode) vis.drillDown(d.data.name);
+                if (!vis.drillMode) {
+                    vis.drillDown(d.data.name);
+                } else {
+                    vis.openDetailedView(d.data.name);
+                }
             })
             .on("mouseenter", function(event, d) {
                 const share = vis.totalValidCount ? ((d.data.value / vis.totalValidCount) * 100).toFixed(2) : "0.00";
                 const clickToDrillHtml = vis.drillMode
-                    ? ""
+                    ? `<div class="bubble-tooltip-cta">Click to see detailed view.</div>`
                     : `<div class="bubble-tooltip-cta">Click to see breakdown.</div>`;
                 vis.tooltip
                     .style("display", "block")
@@ -360,6 +375,38 @@ class BubbleChart {
         }
 
         legendEl.innerHTML = html;
+    }
+
+    getPrimarySelectionDescription() {
+        const primaryField = this.drillFilterField;
+        const primaryValue = this.drillFilterValue;
+        const displayValue = this.formatDisplayLabel(primaryValue || "");
+
+        if (primaryField === "ecoscore_grade") {
+            return `Items with Ecoscore Rating ${displayValue}`;
+        }
+        if (primaryField === "nutriscore_grade") {
+            return `Items with Nutriscore Rating ${displayValue}`;
+        }
+        if (primaryField === "brands") {
+            return `Items belonging to ${displayValue}`;
+        }
+
+        return "Selected Items";
+    }
+
+    openDetailedView() {
+        if (!this.drillMode) return;
+
+        const descriptor = this.getPrimarySelectionDescription();
+        this.detailedViewSubtitle.text(
+            `Analyse the Various Characteristics and Demographics of ${descriptor}`
+        );
+        this.detailedViewPanel.classed("hidden", false);
+    }
+
+    closeDetailedView() {
+        this.detailedViewPanel.classed("hidden", true);
     }
 
 

@@ -21,10 +21,19 @@
             </p>
             <p>
                 The data is sourced from the Open Food Facts database, which contains information on over 1.5 million food products from around the world. The database includes information on ingredients, nutritional content, and various scores such as Nutri-Score and Eco-Score.
-                The Nutri-Score is a nutritional rating system that assigns a letter grade (A to E) to food products based on their nutritional content, with A being the healthiest and E being the least healthy. The Eco-Score is an environmental rating system that assigns a letter grade (A to E) to food products based on their environmental impact, with A being the most environmentally friendly and E being the least environmentally friendly.
             </p>
             <div id="chart-area">
+                <aside id="score-explanation-panel">
+                    <h4>Score Explanation</h4>
+                    <p>
+                        The Nutri-Score is a nutritional rating system that assigns a letter grade (A to E) to food products based on their nutritional content, with A being the healthiest and E being the least healthy.
+                    </p>
+                    <p>
+                        The Eco-Score is an environmental rating system that assigns a letter grade (A to E, and sometimes A+) to food products based on their environmental impact, with A being the most environmentally friendly and E being the least environmentally friendly.
+                    </p>
+                </aside>
                 <div id="chart-main">
+                    <p id="chart-instruction"><strong>Select from the menus to choose a category, and click on a bubble to see a detailed breakdown.</strong></p>
                     <div id="chart-controls">
                         <select id="categorySelection">
                             <option value="nutriscore_grade">Nutri-Score Grade</option>
@@ -36,6 +45,15 @@
                 <div id="chart-legend"></div>
             </div>
         </section>
+
+        <div id="detailed-view-panel" class="hidden" role="dialog" aria-modal="true" aria-labelledby="detailed-view-title">
+            <div class="detailed-view-content">
+                <button id="detailed-view-close" aria-label="Close detailed view">X</button>
+                <h3 id="detailed-view-title">Detailed View</h3>
+                <p id="detailed-view-subtitle"></p>
+                <svg id="detailed-view-svg" viewBox="0 0 760 360" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
 
         <footer class="citation">
             <p>
