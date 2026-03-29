@@ -63,6 +63,14 @@ class BubbleChart {
         vis.colorScale = d3.scaleOrdinal()
             .range(["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1"]);
 
+        vis.gradeColorMap = {
+            a: "#038141",
+            b: "#85BB2F",
+            c: "#FECB02",
+            d: "#EE8100",
+            e: "#E63E11"
+        };
+
         vis.nodesGroup = vis.svg.append("g").attr("class", "bubble-nodes");
         vis.tooltip = d3.select("body")
             .append("div")
@@ -163,7 +171,7 @@ class BubbleChart {
 
         bubblesEnter.append("circle")
             .attr("r", 0)
-            .attr("fill", d => vis.colorScale(d.data.name))
+            .attr("fill", d => vis.getBubbleColor(d.data.name))
             .attr("fill-opacity", 0.82)
             .attr("stroke", "#222")
             .attr("stroke-width", 1);
@@ -185,6 +193,9 @@ class BubbleChart {
             })
             .on("mouseenter", function(event, d) {
                 const share = vis.totalValidCount ? ((d.data.value / vis.totalValidCount) * 100).toFixed(2) : "0.00";
+                const clickToDrillHtml = vis.drillMode
+                    ? ""
+                    : `<div class="bubble-tooltip-cta">Click to see breakdown.</div>`;
                 vis.tooltip
                     .style("display", "block")
                     .html(
@@ -192,7 +203,7 @@ class BubbleChart {
                         `<strong>Value:</strong> ${d.data.name}<br>` +
                         `<strong>Products:</strong> ${d.data.value}<br>` +
                         `<strong>Share:</strong> ${share}%` +
-                        `<div class="bubble-tooltip-cta">Click to see breakdown.</div>`
+                        clickToDrillHtml
                     );
             })
             .on("mousemove", function(event) {
@@ -213,7 +224,7 @@ class BubbleChart {
             .transition()
             .duration(600)
             .attr("r", d => d.r)
-            .attr("fill", d => vis.colorScale(d.data.name));
+            .attr("fill", d => vis.getBubbleColor(d.data.name));
 
         bubblesMerge.select("text")
             .transition()
@@ -260,6 +271,22 @@ class BubbleChart {
         } else {
             this.wrangleData();
         }
+    }
+
+    getActiveColorField() {
+        return this.drillMode ? this.drillDisplayField : this.categorySelection;
+    }
+
+    getBubbleColor(rawValue) {
+        let vis = this;
+        const activeField = vis.getActiveColorField();
+        const value = String(rawValue).toLowerCase();
+
+        if (activeField === "nutriscore_grade" || activeField === "ecoscore_grade") {
+            return vis.gradeColorMap[value] || "#9aa0a6";
+        }
+
+        return vis.colorScale(value);
     }
 
 

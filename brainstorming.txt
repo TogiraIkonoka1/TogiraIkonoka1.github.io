@@ -56,3 +56,13 @@ Modify the position of the dropdown menus and back buttons.
 - When clicking on a bubble: 
     The back button should appear above the svg to the left. That is, the whole of it should be above the svg, and its left edge should line up with the left edge of the svg.
     The second dropdown menu, if it appears (because the first dropdown is set to Brands) should appear above and to the right (above, with its right edge lining up with the right edge of the svg)
+
+Task 3:
+- When the initial filtering is one ecoscore_grade or nutriscore_grade, or when we drilled down on a brand, the colours should match the
+  official colour scheme for these grades: nutriscore_grade's colour scheme is displayed in nutriscore.jpg open as an editor currently.
+  It ranges from A:dark green, B:light green, C:yellow, D:orange, E:red. ecoscore_grade uses the same colour scheme.
+- When drilling down on a bubble, the tooltip should stop displaying "Click to see breakdown."
+
+
+
+
