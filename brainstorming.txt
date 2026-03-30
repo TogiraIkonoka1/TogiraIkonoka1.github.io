@@ -118,3 +118,11 @@ Task 11:
 
 Task 12:
 - modify the context panel below the bubble chart ot be aligned with the bubble chart (it left and right edges should align with the chart, with the text centered)
+
+Task 13:
+- Expand the detailed view to be large enough to cover most of the screen. It should be approximately wide enough to reach the margins of the main page and reach the top and bottom of the page.
+- Inside the detailed view panel: place on the left side a visualization: place the code necessary to make this visualization inside a new js file: js/detail-pie.js (and make adjustments to main.js and bubble_chart.js if needed to incorporate into design)
+  Place a pie chart with the the other scoring measure's grades (if the intial category or secondary category from selecting a brand is nutriscore, display the ecoscore distribution) for the products belonging to that brand and that nutriscore/ecoscore grade.
+  Then place various statistics about this category on the right, including: average rating, 5 most common categories_tags (not including null)
+  
+

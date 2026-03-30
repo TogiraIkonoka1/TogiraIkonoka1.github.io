@@ -111,6 +111,8 @@ class BubbleChart {
         vis.detailedViewPanel = d3.select("#detailed-view-panel");
         vis.detailedViewSubtitle = d3.select("#detailed-view-subtitle");
         vis.detailedViewCloseBtn = d3.select("#detailed-view-close");
+        vis.detailedViewStats = d3.select("#detailed-view-stats");
+        vis.detailPie = new DetailPie("#detailed-view-svg");
 
         vis.detailedViewCloseBtn.on("click", () => vis.closeDetailedView());
         vis.detailedViewPanel.on("click", function(event) {
@@ -136,7 +138,7 @@ class BubbleChart {
             filteredData = vis.data.filter(d => {
                 const v = d[vis.drillFilterField];
                 return v !== null && v !== undefined &&
-                    String(v).toLowerCase() === vis.drillFilterValue;
+                    vis.normalizeFieldValue(vis.drillFilterField, v) === vis.drillFilterValue;
             });
             activeField = vis.drillDisplayField;
         } else {
@@ -398,13 +400,22 @@ class BubbleChart {
         return "Selected Items";
     }
 
-    openDetailedView() {
+    openDetailedView(clickedName) {
         if (!this.drillMode) return;
 
         const descriptor = this.getPrimarySelectionDescription();
         this.detailedViewSubtitle.text(
             `Analyse the Various Characteristics and Demographics of ${descriptor}`
         );
+
+        const detailData = this.getDetailedData(clickedName);
+        const otherScoreField = this.getOtherScoreField();
+        const pieHeading = otherScoreField === "nutriscore_grade"
+            ? "Nutriscore Distribution"
+            : "Ecoscore Distribution";
+
+        this.detailPie.render(detailData, otherScoreField, pieHeading);
+        this.renderDetailedStats(detailData);
         this.detailedViewPanel.classed("hidden", false);
     }
 
@@ -442,6 +453,113 @@ class BubbleChart {
         if (vis.chartDescription) {
             vis.chartDescription.text(text);
         }
+    }
+
+    normalizeFieldValue(field, value) {
+        const s = String(value).toLowerCase();
+        if (field === "ecoscore_grade" && s === "a-plus") return "a+";
+        return s;
+    }
+
+    getDetailedData(clickedName) {
+        const clickedValue = String(clickedName || "").toLowerCase();
+
+        if (this.drillFilterField === "brands") {
+            // Brand selected first, then nutri/eco grade bubble clicked.
+            return this.data.filter(d => {
+                const brandMatch = d.brands !== null && d.brands !== undefined &&
+                    String(d.brands).toLowerCase() === this.drillFilterValue;
+                const gradeMatch = d[this.drillDisplayField] !== null && d[this.drillDisplayField] !== undefined &&
+                    this.normalizeFieldValue(this.drillDisplayField, d[this.drillDisplayField]) === clickedValue;
+                return brandMatch && gradeMatch;
+            });
+        }
+
+        // Nutri/Eco selected first, then brand bubble clicked.
+        return this.data.filter(d => {
+            const primaryMatch = d[this.drillFilterField] !== null && d[this.drillFilterField] !== undefined &&
+                this.normalizeFieldValue(this.drillFilterField, d[this.drillFilterField]) === this.drillFilterValue;
+            const brandMatch = d.brands !== null && d.brands !== undefined &&
+                String(d.brands).toLowerCase() === clickedValue;
+            return primaryMatch && brandMatch;
+        });
+    }
+
+    getOtherScoreField() {
+        const activeScoreField = this.drillFilterField === "brands"
+            ? this.drillDisplayField
+            : this.drillFilterField;
+        return activeScoreField === "nutriscore_grade" ? "ecoscore_grade" : "nutriscore_grade";
+    }
+
+    normalizeCategoriesTags(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) return value;
+        if (typeof value === "string") {
+            return value.split(",").map(s => s.trim()).filter(Boolean);
+        }
+        return [];
+    }
+
+    computeAverageGrade(records, field) {
+        const nutriRank = { a: 1, b: 2, c: 3, d: 4, e: 5 };
+        const ecoRank = { "a+": 1, a: 2, b: 3, c: 4, d: 5, e: 6, f: 7 };
+        const scale = field === "nutriscore_grade" ? nutriRank : ecoRank;
+
+        const values = records
+            .map(d => d[field])
+            .filter(v => v !== null && v !== undefined && v !== "")
+            .map(v => {
+                const s = String(v).toLowerCase();
+                return field === "ecoscore_grade" && s === "a-plus" ? "a+" : s;
+            })
+            .filter(v => Object.prototype.hasOwnProperty.call(scale, v))
+            .map(v => scale[v]);
+
+        if (!values.length) return "N/A";
+
+        const avg = d3.mean(values);
+        return avg.toFixed(2);
+    }
+
+    renderDetailedStats(records) {
+        if (!this.detailedViewStats) return;
+
+        const categoryCounts = d3.rollups(
+            records.flatMap(d => this.normalizeCategoriesTags(d.categories_tags)
+                .filter(tag => tag !== null && tag !== undefined && tag !== "")),
+            v => v.length,
+            d => String(d)
+        )
+            .sort((a, b) => d3.descending(a[1], b[1]))
+            .slice(0, 5);
+
+        const formatTag = (tag) => String(tag)
+            .replace(/^en:/, "")
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, c => c.toUpperCase());
+
+        const nutriAverage = this.computeAverageGrade(records, "nutriscore_grade");
+        const ecoAverage = this.computeAverageGrade(records, "ecoscore_grade");
+
+        let html = "";
+        html += `<h4 class="detail-stats-title">Category Statistics</h4>`;
+        html += `<div class="detail-stat-line"><span>Products in selection:</span><strong>${records.length}</strong></div>`;
+        html += `<div class="detail-stat-line"><span>Average Nutriscore:</span><strong>${nutriAverage}</strong></div>`;
+        html += `<div class="detail-stat-line"><span>Average Ecoscore:</span><strong>${ecoAverage}</strong></div>`;
+        html += `<h5 class="detail-stats-subtitle">Top Category Tags</h5>`;
+
+        if (categoryCounts.length) {
+            html += `<ol class="detail-tag-list">`;
+            categoryCounts.forEach(([tag, count]) => {
+                html += `<li><span>${formatTag(tag)}</span><strong>${count}</strong></li>`;
+            });
+            html += `</ol>`;
+        } else {
+            html += `<p class="detail-tag-empty">No category tags available.</p>`;
+        }
+
+        this.detailedViewStats.html(html);
     }
 
 }

@@ -54,7 +54,12 @@
                 <button id="detailed-view-close" aria-label="Close detailed view">X</button>
                 <h3 id="detailed-view-title">Detailed View</h3>
                 <p id="detailed-view-subtitle"></p>
-                <svg id="detailed-view-svg" viewBox="0 0 760 360" preserveAspectRatio="xMidYMid meet"></svg>
+                <div id="detailed-view-body">
+                    <div id="detailed-view-left">
+                        <svg id="detailed-view-svg" viewBox="0 0 760 560" preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
+                    <aside id="detailed-view-stats"></aside>
+                </div>
             </div>
         </div>
 
@@ -66,6 +71,7 @@
 	</main>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="js/bubble_chart.js"></script>
+    <script src="js/detail-pie.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

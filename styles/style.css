@@ -245,7 +245,7 @@ p {
 	align-items: center;
 	justify-content: center;
 	background: rgba(5, 10, 20, 0.72);
-	padding: 18px;
+	padding: 10px;
 }
 
 #detailed-view-panel.hidden {
@@ -254,12 +254,15 @@ p {
 
 .detailed-view-content {
 	position: relative;
-	width: min(860px, 95vw);
+	width: min(1360px, calc(100vw - 20px));
+	height: calc(100vh - 20px);
 	background: #0f2649;
 	border: 1px solid #35578f;
 	border-radius: 12px;
-	padding: 20px 20px 16px;
+	padding: 18px 20px 16px;
 	box-shadow: 0 16px 45px rgba(0, 0, 0, 0.42);
+	display: flex;
+	flex-direction: column;
 }
 
 #detailed-view-close {
@@ -294,12 +297,88 @@ p {
 	color: #d7e3ff;
 }
 
+#detailed-view-body {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	gap: 18px;
+}
+
+#detailed-view-left {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
 #detailed-view-svg {
 	width: 100%;
-	height: 360px;
+	height: 100%;
 	background: rgba(5, 12, 26, 0.35);
 	border: 1px dashed #4f6fa4;
 	border-radius: 8px;
+}
+
+#detailed-view-stats {
+	flex: 0 0 330px;
+	background: rgba(13, 30, 60, 0.75);
+	border: 1px solid #2a4a7f;
+	border-radius: 8px;
+	padding: 14px 14px 10px;
+	overflow-y: auto;
+}
+
+.detail-stats-title {
+	margin: 0 0 10px;
+	font-size: 0.92rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: #9bb4df;
+}
+
+.detail-stats-subtitle {
+	margin: 14px 0 8px;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #9bb4df;
+}
+
+.detail-stat-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 0;
+	border-bottom: 1px solid rgba(155, 180, 223, 0.2);
+	font-size: 0.92rem;
+	color: #d7e3ff;
+}
+
+.detail-stat-line strong {
+	color: #ffffff;
+}
+
+.detail-tag-list {
+	margin: 0;
+	padding-left: 18px;
+	color: #d7e3ff;
+}
+
+.detail-tag-list li {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 4px 0;
+	font-size: 0.9rem;
+}
+
+.detail-tag-list li strong {
+	color: #ffffff;
+}
+
+.detail-tag-empty {
+	margin: 0;
+	font-size: 0.9rem;
+	color: #b7c9ef;
 }
 
 @media (max-width: 1180px) {
@@ -325,5 +404,19 @@ p {
 
 	#chart-legend {
 		margin-top: 0;
+	}
+
+	.detailed-view-content {
+		width: calc(100vw - 18px);
+		height: calc(100vh - 18px);
+	}
+
+	#detailed-view-body {
+		flex-direction: column;
+	}
+
+	#detailed-view-stats {
+		flex: 0 0 auto;
+		max-height: 240px;
 	}
 }
