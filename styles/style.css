@@ -42,6 +42,8 @@ p {
 	width: 340px;
 	max-width: 380px;
 	flex: 0 0 340px;
+	align-self: center;
+	margin-top: 40px;
 	background: rgba(13, 30, 60, 0.85);
 	border: 1px solid #2a4a7f;
 	border-radius: 8px;
@@ -286,6 +288,11 @@ p {
 		width: min(760px, 95vw);
 		max-width: none;
 		flex: 0 0 auto;
+	}
+
+	#score-explanation-panel {
+		align-self: stretch;
+		margin-top: 0;
 	}
 
 	#chart-legend {

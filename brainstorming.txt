@@ -106,3 +106,6 @@ Task 8:
 
 Task 9:
 - modify the side panel explaining the nutriscore and ecoscore to be wider so that the letters are not so squished.
+
+Task 10:
+- readjust the position of the side panel explanation so that its center lines up with the center of the bubble chart.
