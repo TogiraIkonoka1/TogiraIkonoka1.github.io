@@ -391,24 +391,6 @@ class BubbleChart {
         legendEl.innerHTML = html;
     }
 
-    getPrimarySelectionDescription() {
-        const primaryField = this.drillFilterField;
-        const primaryValue = this.drillFilterValue;
-        const displayValue = this.formatDisplayLabel(primaryValue || "");
-
-        if (primaryField === "ecoscore_grade") {
-            return `Items with Ecoscore Rating ${displayValue}`;
-        }
-        if (primaryField === "nutriscore_grade") {
-            return `Items with Nutriscore Rating ${displayValue}`;
-        }
-        if (primaryField === "brands") {
-            return `Items belonging to ${displayValue}`;
-        }
-
-        return "Selected Items";
-    }
-
     openDetailedView(clickedName) {
         if (!this.drillMode) return;
 
@@ -467,17 +449,21 @@ class BubbleChart {
 
     getDetailedBrand(clickedName) {
         if (this.drillFilterField === "brands") {
-            return this.drillFilterValue || "unknown";
+            return this.normalizeBrandValue(this.drillFilterValue || "unknown");
         }
-        return String(clickedName || "unknown").toLowerCase();
+        return this.normalizeBrandValue(clickedName || "unknown");
+    }
+
+    normalizeBrandValue(value) {
+        return String(value || "").toLowerCase().trim();
     }
 
     getBrandRecords(brandName) {
-        const normalizedBrand = String(brandName || "").toLowerCase();
+        const normalizedBrand = this.normalizeBrandValue(brandName);
         return this.data.filter(d =>
             d.brands !== null &&
             d.brands !== undefined &&
-            String(d.brands).toLowerCase() === normalizedBrand
+            this.normalizeBrandValue(d.brands) === normalizedBrand
         );
     }
 

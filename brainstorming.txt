@@ -130,4 +130,7 @@ Task 14:
 - two piecharts should be present on the left side, each with a legend and a tooltip for displaying information.
   The top left one should be for ecoscore grades, and the bottom left should be for nutriscore grades.
   The right side should various statistics about the brand. Average ratings (include an explanation of how the average is calculated when hovering over the average), most common category tags, etc.
-  
+
+Task 15:
+- fix data selection: the detailed view should have access to all data points from that brand.
+- The subtitle should say "Detailed Demographics of {brand name}" rather than "Analyse the Various Characteristics and Demographics of Items with Nutriscore Rating {rating}"
