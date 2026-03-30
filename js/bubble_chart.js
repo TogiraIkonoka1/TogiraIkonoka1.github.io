@@ -112,7 +112,16 @@ class BubbleChart {
         vis.detailedViewSubtitle = d3.select("#detailed-view-subtitle");
         vis.detailedViewCloseBtn = d3.select("#detailed-view-close");
         vis.detailedViewStats = d3.select("#detailed-view-stats");
-        vis.detailPie = new DetailPie("#detailed-view-svg");
+        vis.ecoDetailPie = new DetailPie({
+            svgSelector: "#detail-eco-svg",
+            legendSelector: "#detail-eco-legend",
+            field: "ecoscore_grade"
+        });
+        vis.nutriDetailPie = new DetailPie({
+            svgSelector: "#detail-nutri-svg",
+            legendSelector: "#detail-nutri-legend",
+            field: "nutriscore_grade"
+        });
 
         vis.detailedViewCloseBtn.on("click", () => vis.closeDetailedView());
         vis.detailedViewPanel.on("click", function(event) {
@@ -403,19 +412,14 @@ class BubbleChart {
     openDetailedView(clickedName) {
         if (!this.drillMode) return;
 
-        const descriptor = this.getPrimarySelectionDescription();
-        this.detailedViewSubtitle.text(
-            `Analyse the Various Characteristics and Demographics of ${descriptor}`
-        );
+        const brandName = this.getDetailedBrand(clickedName);
+        const brandLabel = this.formatBrandLabel(brandName);
+        const brandRecords = this.getBrandRecords(brandName);
 
-        const detailData = this.getDetailedData(clickedName);
-        const otherScoreField = this.getOtherScoreField();
-        const pieHeading = otherScoreField === "nutriscore_grade"
-            ? "Nutriscore Distribution"
-            : "Ecoscore Distribution";
-
-        this.detailPie.render(detailData, otherScoreField, pieHeading);
-        this.renderDetailedStats(detailData);
+        this.detailedViewSubtitle.text(`Detailed Demographics of ${brandLabel}`);
+        this.ecoDetailPie.render(brandRecords);
+        this.nutriDetailPie.render(brandRecords);
+        this.renderDetailedStats(brandRecords, brandLabel);
         this.detailedViewPanel.classed("hidden", false);
     }
 
@@ -461,35 +465,24 @@ class BubbleChart {
         return s;
     }
 
-    getDetailedData(clickedName) {
-        const clickedValue = String(clickedName || "").toLowerCase();
-
+    getDetailedBrand(clickedName) {
         if (this.drillFilterField === "brands") {
-            // Brand selected first, then nutri/eco grade bubble clicked.
-            return this.data.filter(d => {
-                const brandMatch = d.brands !== null && d.brands !== undefined &&
-                    String(d.brands).toLowerCase() === this.drillFilterValue;
-                const gradeMatch = d[this.drillDisplayField] !== null && d[this.drillDisplayField] !== undefined &&
-                    this.normalizeFieldValue(this.drillDisplayField, d[this.drillDisplayField]) === clickedValue;
-                return brandMatch && gradeMatch;
-            });
+            return this.drillFilterValue || "unknown";
         }
-
-        // Nutri/Eco selected first, then brand bubble clicked.
-        return this.data.filter(d => {
-            const primaryMatch = d[this.drillFilterField] !== null && d[this.drillFilterField] !== undefined &&
-                this.normalizeFieldValue(this.drillFilterField, d[this.drillFilterField]) === this.drillFilterValue;
-            const brandMatch = d.brands !== null && d.brands !== undefined &&
-                String(d.brands).toLowerCase() === clickedValue;
-            return primaryMatch && brandMatch;
-        });
+        return String(clickedName || "unknown").toLowerCase();
     }
 
-    getOtherScoreField() {
-        const activeScoreField = this.drillFilterField === "brands"
-            ? this.drillDisplayField
-            : this.drillFilterField;
-        return activeScoreField === "nutriscore_grade" ? "ecoscore_grade" : "nutriscore_grade";
+    getBrandRecords(brandName) {
+        const normalizedBrand = String(brandName || "").toLowerCase();
+        return this.data.filter(d =>
+            d.brands !== null &&
+            d.brands !== undefined &&
+            String(d.brands).toLowerCase() === normalizedBrand
+        );
+    }
+
+    formatBrandLabel(brandName) {
+        return String(brandName || "Unknown").replace(/\b\w/g, c => c.toUpperCase());
     }
 
     normalizeCategoriesTags(value) {
@@ -522,7 +515,7 @@ class BubbleChart {
         return avg.toFixed(2);
     }
 
-    renderDetailedStats(records) {
+    renderDetailedStats(records, brandLabel) {
         if (!this.detailedViewStats) return;
 
         const categoryCounts = d3.rollups(
@@ -543,10 +536,11 @@ class BubbleChart {
         const ecoAverage = this.computeAverageGrade(records, "ecoscore_grade");
 
         let html = "";
-        html += `<h4 class="detail-stats-title">Category Statistics</h4>`;
-        html += `<div class="detail-stat-line"><span>Products in selection:</span><strong>${records.length}</strong></div>`;
-        html += `<div class="detail-stat-line"><span>Average Nutriscore:</span><strong>${nutriAverage}</strong></div>`;
-        html += `<div class="detail-stat-line"><span>Average Ecoscore:</span><strong>${ecoAverage}</strong></div>`;
+        html += `<h4 class="detail-stats-title">Brand Statistics</h4>`;
+        html += `<div class="detail-stat-line"><span>Brand:</span><strong>${brandLabel}</strong></div>`;
+        html += `<div class="detail-stat-line"><span>Products in database:</span><strong>${records.length}</strong></div>`;
+        html += `<div class="detail-stat-line"><span class="detail-label-with-help">Average Nutriscore<span class="detail-help" title="Average calculation: A=1, B=2, C=3, D=4, E=5. The mean is computed over all products from this brand that have a valid Nutriscore.">?</span></span><strong>${nutriAverage}</strong></div>`;
+        html += `<div class="detail-stat-line"><span class="detail-label-with-help">Average Ecoscore<span class="detail-help" title="Average calculation: A+=1, A=2, B=3, C=4, D=5, E=6, F=7. The mean is computed over all products from this brand that have a valid Ecoscore.">?</span></span><strong>${ecoAverage}</strong></div>`;
         html += `<h5 class="detail-stats-subtitle">Top Category Tags</h5>`;
 
         if (categoryCounts.length) {

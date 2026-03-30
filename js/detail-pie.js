@@ -1,8 +1,10 @@
 class DetailPie {
-    constructor(svgSelector) {
-        this.svg = d3.select(svgSelector);
-        this.width = 760;
-        this.height = 560;
+    constructor(config) {
+        this.svg = d3.select(config.svgSelector);
+        this.legend = d3.select(config.legendSelector);
+        this.field = config.field;
+        this.width = 420;
+        this.height = 240;
 
         this.nutriColors = {
             a: "#038141",
@@ -22,51 +24,85 @@ class DetailPie {
             f: "#E63E11"
         };
 
-        this.fallbackColors = d3.scaleOrdinal()
-            .range(["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1"]);
+        this.tooltip = d3.select("body").select("#detail-pie-tooltip");
+        if (this.tooltip.empty()) {
+            this.tooltip = d3.select("body")
+                .append("div")
+                .attr("id", "detail-pie-tooltip")
+                .attr("class", "detail-pie-tooltip")
+                .style("display", "none");
+        }
     }
 
-    getColor(field, key) {
-        if (field === "nutriscore_grade") {
+    getColor(key) {
+        if (this.field === "nutriscore_grade") {
             return this.nutriColors[key] || "#9aa0a6";
         }
-        if (field === "ecoscore_grade") {
-            return this.ecoColors[key] || "#9aa0a6";
-        }
-        return this.fallbackColors(key);
+        return this.ecoColors[key] || "#9aa0a6";
     }
 
-    formatGradeLabel(field, value) {
-        if (field === "nutriscore_grade" || field === "ecoscore_grade") {
-            return String(value).toUpperCase();
-        }
-        return String(value);
+    formatLabel(value) {
+        return String(value).toUpperCase();
     }
 
-    render(records, field, heading) {
+    normalizeGrade(value) {
+        const s = String(value).toLowerCase();
+        if (this.field === "ecoscore_grade" && s === "a-plus") return "a+";
+        return s;
+    }
+
+    getAggregated(records) {
         const NA_VALUES = new Set([
             "unknown", "not-applicable", "not applicable", "not_applicable",
             "not-available", "not available", "not_available", "n/a", "na"
         ]);
 
         const values = records
-            .map(d => d[field])
+            .map(d => d[this.field])
             .filter(v => {
                 if (v === null || v === undefined || v === "") return false;
                 const s = String(v).toLowerCase();
                 return !NA_VALUES.has(s) && !s.startsWith("en:not-");
             })
-            .map(v => {
-                const s = String(v).toLowerCase();
-                if (field === "ecoscore_grade" && s === "a-plus") return "a+";
-                return s;
-            });
+            .map(v => this.normalizeGrade(v));
 
-        const aggregated = d3.rollups(values, arr => arr.length, d => d)
+        return d3.rollups(values, arr => arr.length, d => d)
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => d3.descending(a.value, b.value));
+    }
+
+    renderLegend(aggregated) {
+        this.legend.html("");
+
+        if (!aggregated.length) {
+            this.legend.html('<p class="detail-tag-empty">No grade data available.</p>');
+            return;
+        }
+
+        aggregated.forEach(item => {
+            const row = this.legend.append("div").attr("class", "detail-pie-legend-item");
+            const left = row.append("div").attr("class", "detail-pie-legend-left");
+
+            left.append("span")
+                .attr("class", "detail-pie-legend-swatch")
+                .style("background", this.getColor(item.name));
+
+            left.append("span")
+                .attr("class", "detail-pie-legend-label")
+                .text(this.formatLabel(item.name));
+
+            row.append("span")
+                .attr("class", "detail-pie-legend-count")
+                .text(item.value);
+        });
+    }
+
+    render(records) {
+        const aggregated = this.getAggregated(records);
+        const total = d3.sum(aggregated, d => d.value);
 
         this.svg.selectAll("*").remove();
+        this.renderLegend(aggregated);
 
         if (!aggregated.length) {
             this.svg.append("text")
@@ -74,23 +110,14 @@ class DetailPie {
                 .attr("y", this.height / 2)
                 .attr("text-anchor", "middle")
                 .style("fill", "#d7e3ff")
-                .style("font-size", "18px")
-                .text("No data available for pie chart");
+                .style("font-size", "14px")
+                .text("No data available");
             return;
         }
 
-        const radius = Math.min(this.width * 0.46, this.height * 0.62) / 2;
-        const centerX = this.width * 0.33;
-        const centerY = this.height * 0.52;
-
-        this.svg.append("text")
-            .attr("x", centerX)
-            .attr("y", 42)
-            .attr("text-anchor", "middle")
-            .style("fill", "#f2f6ff")
-            .style("font-size", "20px")
-            .style("font-weight", 700)
-            .text(heading);
+        const radius = Math.min(this.width * 0.48, this.height * 0.82) / 2;
+        const centerX = this.width * 0.5;
+        const centerY = this.height * 0.54;
 
         const pie = d3.pie()
             .sort(null)
@@ -108,9 +135,27 @@ class DetailPie {
             .enter()
             .append("path")
             .attr("d", arc)
-            .attr("fill", d => this.getColor(field, d.data.name))
+            .attr("fill", d => this.getColor(d.data.name))
             .attr("stroke", "#0b1f3a")
-            .attr("stroke-width", 2);
+            .attr("stroke-width", 2)
+            .on("mouseenter", (event, d) => {
+                const pct = total ? ((d.data.value / total) * 100).toFixed(1) : "0.0";
+                this.tooltip
+                    .style("display", "block")
+                    .html(
+                        `<strong>${this.formatLabel(d.data.name)}</strong><br>` +
+                        `Products: ${d.data.value}<br>` +
+                        `Share: ${pct}%`
+                    );
+            })
+            .on("mousemove", (event) => {
+                this.tooltip
+                    .style("left", `${event.clientX + 12}px`)
+                    .style("top", `${event.clientY + 12}px`);
+            })
+            .on("mouseleave", () => {
+                this.tooltip.style("display", "none");
+            });
 
         group.selectAll("text")
             .data(pie(aggregated))
@@ -119,33 +164,11 @@ class DetailPie {
             .attr("transform", d => `translate(${arc.centroid(d)})`)
             .attr("text-anchor", "middle")
             .style("fill", "#ffffff")
-            .style("font-size", "12px")
+            .style("font-size", "11px")
             .style("font-weight", 700)
             .text(d => {
-                const total = d3.sum(aggregated, x => x.value);
                 const pct = total ? Math.round((d.data.value / total) * 100) : 0;
-                return pct >= 7 ? `${this.formatGradeLabel(field, d.data.name)} ${pct}%` : "";
+                return pct >= 8 ? `${this.formatLabel(d.data.name)} ${pct}%` : "";
             });
-
-        const legend = this.svg.append("g")
-            .attr("transform", `translate(${this.width * 0.62},${this.height * 0.2})`);
-
-        aggregated.forEach((item, i) => {
-            const y = i * 32;
-            legend.append("rect")
-                .attr("x", 0)
-                .attr("y", y)
-                .attr("width", 18)
-                .attr("height", 18)
-                .attr("rx", 3)
-                .attr("fill", this.getColor(field, item.name));
-
-            legend.append("text")
-                .attr("x", 28)
-                .attr("y", y + 13)
-                .style("fill", "#d7e3ff")
-                .style("font-size", "14px")
-                .text(`${this.formatGradeLabel(field, item.name)} (${item.value})`);
-        });
     }
 }

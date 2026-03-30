@@ -307,14 +307,41 @@ p {
 #detailed-view-left {
 	flex: 1 1 auto;
 	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
 }
 
-#detailed-view-svg {
-	width: 100%;
-	height: 100%;
+.detail-chart-card {
+	flex: 1 1 0;
 	background: rgba(5, 12, 26, 0.35);
 	border: 1px dashed #4f6fa4;
 	border-radius: 8px;
+	padding: 10px 12px;
+	min-height: 0;
+}
+
+.detail-chart-title {
+	margin: 0 0 8px;
+	font-size: 0.84rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: #9bb4df;
+}
+
+.detail-chart-row {
+	height: calc(100% - 28px);
+	display: flex;
+	align-items: stretch;
+	gap: 12px;
+}
+
+#detail-eco-svg,
+#detail-nutri-svg {
+	flex: 1 1 auto;
+	width: 100%;
+	height: 100%;
+	min-height: 160px;
 }
 
 #detailed-view-stats {
@@ -324,6 +351,63 @@ p {
 	border-radius: 8px;
 	padding: 14px 14px 10px;
 	overflow-y: auto;
+}
+
+.detail-pie-legend {
+	flex: 0 0 180px;
+	overflow-y: auto;
+	padding-right: 2px;
+}
+
+.detail-pie-legend-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 4px 0;
+	font-size: 0.86rem;
+	color: #d7e3ff;
+}
+
+.detail-pie-legend-left {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+}
+
+.detail-pie-legend-swatch {
+	width: 12px;
+	height: 12px;
+	border-radius: 2px;
+	flex-shrink: 0;
+	border: 1px solid rgba(255,255,255,0.2);
+}
+
+.detail-pie-legend-label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.detail-pie-legend-count {
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.detail-pie-tooltip {
+	position: fixed;
+	z-index: 1250;
+	pointer-events: none;
+	background: rgba(8, 14, 30, 0.96);
+	color: #f2f6ff;
+	border: 1px solid #9bb4df;
+	border-radius: 8px;
+	padding: 8px 10px;
+	font-size: 12px;
+	line-height: 1.35;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+	display: none;
 }
 
 .detail-stats-title {
@@ -355,6 +439,28 @@ p {
 
 .detail-stat-line strong {
 	color: #ffffff;
+}
+
+.detail-label-with-help {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.detail-help {
+	width: 16px;
+	height: 16px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid #8fa9d6;
+	font-size: 0.72rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #d7e3ff;
+	cursor: help;
+	user-select: none;
 }
 
 .detail-tag-list {
@@ -413,6 +519,29 @@ p {
 
 	#detailed-view-body {
 		flex-direction: column;
+	}
+
+	#detailed-view-left {
+		gap: 10px;
+	}
+
+	.detail-chart-card {
+		min-height: 230px;
+	}
+
+	.detail-chart-row {
+		flex-direction: column;
+		height: auto;
+	}
+
+	#detail-eco-svg,
+	#detail-nutri-svg {
+		height: 190px;
+	}
+
+	.detail-pie-legend {
+		flex: 0 0 auto;
+		max-height: 140px;
 	}
 
 	#detailed-view-stats {

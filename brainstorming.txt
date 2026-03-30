@@ -125,4 +125,9 @@ Task 13:
   Place a pie chart with the the other scoring measure's grades (if the intial category or secondary category from selecting a brand is nutriscore, display the ecoscore distribution) for the products belonging to that brand and that nutriscore/ecoscore grade.
   Then place various statistics about this category on the right, including: average rating, 5 most common categories_tags (not including null)
   
-
+Task 14:
+- modify the detailed view to take the brand initially drilled down upon or selected afterwards and display its information in the detailed view. The subtitle should always says "Detailed Demographics of {brand name}"
+- two piecharts should be present on the left side, each with a legend and a tooltip for displaying information.
+  The top left one should be for ecoscore grades, and the bottom left should be for nutriscore grades.
+  The right side should various statistics about the brand. Average ratings (include an explanation of how the average is calculated when hovering over the average), most common category tags, etc.
+  
