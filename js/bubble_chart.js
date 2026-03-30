@@ -119,6 +119,8 @@ class BubbleChart {
             }
         });
 
+        vis.chartDescription = d3.select("#chart-description");
+
         vis.wrangleData();
     }
 
@@ -271,6 +273,7 @@ class BubbleChart {
             .style("font-size", d => `${Math.max(10, Math.min(16, d.r * 0.25))}px`);
 
         vis.renderLegend();
+        vis.updateChartDescription();
     }
 
     drillDown(clickedName) {
@@ -409,6 +412,36 @@ class BubbleChart {
         this.detailedViewPanel.classed("hidden", true);
     }
 
+    updateChartDescription() {
+        let vis = this;
+        let text = "";
 
+        if (!vis.drillMode) {
+            if (vis.categorySelection === "brands") {
+                text = "Most Frequent Brands in the Database";
+            } else if (vis.categorySelection === "nutriscore_grade") {
+                text = "Distribution of Nutriscores";
+            } else if (vis.categorySelection === "ecoscore_grade") {
+                text = "Distribution of Ecoscores";
+            }
+        } else {
+            const filterValue = vis.formatDisplayLabel(vis.drillFilterValue || "");
+            if (vis.drillFilterField === "nutriscore_grade") {
+                text = `Most Frequent Brands with Nutriscore ${filterValue}`;
+            } else if (vis.drillFilterField === "ecoscore_grade") {
+                text = `Most Frequent Brands with Ecoscore ${filterValue}`;
+            } else if (vis.drillFilterField === "brands") {
+                if (vis.drillDisplayField === "nutriscore_grade") {
+                    text = `Nutriscore Distribution for ${filterValue}`;
+                } else if (vis.drillDisplayField === "ecoscore_grade") {
+                    text = `Ecoscore Distribution for ${filterValue}`;
+                }
+            }
+        }
+
+        if (vis.chartDescription) {
+            vis.chartDescription.text(text);
+        }
+    }
 
 }

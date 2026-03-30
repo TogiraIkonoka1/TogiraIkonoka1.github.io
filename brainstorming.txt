@@ -109,3 +109,9 @@ Task 9:
 
 Task 10:
 - readjust the position of the side panel explanation so that its center lines up with the center of the bubble chart.
+
+Task 11: 
+- add a panel below the bubble chart, above the data citation. This panel should explain the contents of the bubble chart. For example, on the intial view, 
+  if "Brands" is selected, it should say "Most Frequent Brands in the Database" and if it is Nutriscore, it should say "Distribution of Nutriscores", etc.
+  If we have drilled down, it should say what category we have drilled down from. If we drilled down from Nutriscore by clicking on A, it
+  should say "Most Frequent Brands with Nutriscore A" and similar for Ecoscore. If we initially chose Brands, clicked on Asda, it should say "Nutriscore dsitribution for Asda" or "Ecoscore distribution for Asda" depending on the selection of the second dorpdown menu.

@@ -131,6 +131,19 @@ p {
 	color: #ffffff;
 }
 
+#chart-description {
+	margin-top: 18px;
+	padding: 12px 20px;
+	background: rgba(13, 30, 60, 0.7);
+	border: 1px solid #2a4a7f;
+	border-radius: 8px;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #d7e3ff;
+	text-align: center;
+	letter-spacing: 0.02em;
+}
+
 .citation {
 	margin-top: 36px;
 	padding-top: 12px;
