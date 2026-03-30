@@ -77,6 +77,15 @@ p {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	width: 700px;
+	max-width: 100%;
+	flex: 0 0 auto;
+}
+
+#chart-center-column {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	flex: 0 0 auto;
 }
 
@@ -133,10 +142,13 @@ p {
 
 #chart-description {
 	margin-top: 18px;
+	width: 700px;
+	max-width: 100%;
 	padding: 12px 20px;
 	background: rgba(13, 30, 60, 0.7);
 	border: 1px solid #2a4a7f;
 	border-radius: 8px;
+	box-sizing: border-box;
 	font-size: 1rem;
 	font-weight: 600;
 	color: #d7e3ff;
@@ -296,6 +308,9 @@ p {
 		align-items: center;
 	}
 
+	#chart-center-column,
+	#chart-main,
+	#chart-description,
 	#score-explanation-panel,
 	#chart-legend {
 		width: min(760px, 95vw);

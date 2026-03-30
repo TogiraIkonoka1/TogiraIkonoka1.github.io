@@ -115,3 +115,6 @@ Task 11:
   if "Brands" is selected, it should say "Most Frequent Brands in the Database" and if it is Nutriscore, it should say "Distribution of Nutriscores", etc.
   If we have drilled down, it should say what category we have drilled down from. If we drilled down from Nutriscore by clicking on A, it
   should say "Most Frequent Brands with Nutriscore A" and similar for Ecoscore. If we initially chose Brands, clicked on Asda, it should say "Nutriscore dsitribution for Asda" or "Ecoscore distribution for Asda" depending on the selection of the second dorpdown menu.
+
+Task 12:
+- modify the context panel below the bubble chart ot be aligned with the bubble chart (it left and right edges should align with the chart, with the text centered)
